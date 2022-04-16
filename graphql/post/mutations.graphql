@@ -1,0 +1,15 @@
+mutation createPost($input: PostInput!) {
+   createPost(input: $input) {
+      ...RegularPost
+   }
+}
+
+mutation deletePost($id: Int!) {
+   deletePost(id: $id)
+}
+
+mutation updatePost($id: Int!, $text: String!) {
+   updatePost(id: $id, text: $text) {
+      ...RegularPost
+   }
+}

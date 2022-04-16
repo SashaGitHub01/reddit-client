@@ -1,0 +1,14 @@
+query posts($limit: Int!, $offset: Int){
+   posts(limit: $limit, offset: $offset) {
+      hasMore
+      posts {
+         ...RegularPost
+      }
+   }
+}
+
+query post($id: Int!) {
+   post(id: $id) {
+      ...RegularPost
+   }
+}

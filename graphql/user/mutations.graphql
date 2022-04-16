@@ -1,0 +1,25 @@
+mutation REGISTER ($input: RegInput!) {
+      registration(input: $input) {
+         ...RegularUser
+      }
+}
+
+mutation LOGIN ($input: LoginInput!) {
+      login(input: $input) {
+         ...RegularUser
+      }
+}
+
+mutation LOGOUT {
+   logout
+} 
+
+mutation forgotPassword($email: String!) {
+   forgotPassword(email: $email)
+}
+
+mutation changePassword($newPassword: String!, $secret: String!) {
+   changePassword(newPassword:$newPassword, secret: $secret) {
+      ...RegularUser
+   }
+}

@@ -1,0 +1,13 @@
+
+
+query ME {
+   me {
+      ...RegularUser
+   }
+}
+
+query USERS {
+   users {
+      ...RegularUser
+   }
+}
