@@ -1,8 +1,8 @@
-import { cacheExchange, Entity, Resolver } from "@urql/exchange-graphcache"
+import { Cache, cacheExchange, Entity, Resolver } from "@urql/exchange-graphcache"
 import { dedupExchange, fetchExchange, gql, stringifyVariables } from "urql"
 import {
    DeletePostMutationVariables,
-   LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation, VoteMutation, VoteMutationVariables,
+   LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation, UpdatePostMutationVariables, VoteMutation, VoteMutationVariables,
 } from "../generated/graphql"
 import { isServer } from "./isServer";
 import { updQuery } from "./updQuery"
@@ -100,6 +100,14 @@ export const simplePagination = (): Resolver<any, any, any> => {
    };
 };
 
+const invalideteAllPosts = (cache: Cache) => {
+   const all = cache.inspectFields('Query')
+   const fieldInfos = all.filter(i => i.fieldName === 'posts')
+   fieldInfos.forEach(field => {
+      cache.invalidate('Query', 'posts', field.arguments)
+   })
+}
+
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
    let cookie = ''
 
@@ -133,6 +141,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                         (res, query) => {
                            return { me: res.login }
                         })
+                     invalideteAllPosts(cache)
                   },
 
                   registration: (result, args, cache, info) => {
@@ -179,14 +188,14 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
                   },
 
                   createPost: (result, args, cache, info) => {
-                     const all = cache.inspectFields('Query')
-                     const fieldInfos = all.filter(i => i.fieldName === 'posts')
-                     fieldInfos.forEach(field => {
-                        cache.invalidate('Query', 'posts', field.arguments)
-                     })
+                     invalideteAllPosts(cache)
                   },
 
                   deletePost: (result, args: DeletePostMutationVariables, cache, info) => {
+                     cache.invalidate({ __typename: 'Post', id: args.id })
+                  },
+
+                  updatePost: (result, args: UpdatePostMutationVariables, cache, info) => {
                      cache.invalidate({ __typename: 'Post', id: args.id })
                   },
                }

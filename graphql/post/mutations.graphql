@@ -10,6 +10,6 @@ mutation deletePost($id: Int!) {
 
 mutation updatePost($id: Int!, $text: String!) {
    updatePost(id: $id, text: $text) {
-      ...RegularPost
+      text
    }
 }

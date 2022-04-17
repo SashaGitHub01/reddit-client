@@ -37,7 +37,7 @@ const Post: React.FC<PostProps> = ({ createdAt, creatorId, isMy, id, text, title
                   </div>
                </div>
                <div className="px-2">
-                  <PostActions isMy={isMy} />
+                  <PostActions isMy={isMy} id={id} link={true} />
                </div>
             </div>
          </div>

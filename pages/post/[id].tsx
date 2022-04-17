@@ -1,34 +1,19 @@
 import { withUrqlClient } from 'next-urql'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React from 'react'
 import Loader from '../../components/Loader'
 import UpdootsSection from '../../components/Post/UpdootsSection'
 import PostActions from '../../components/Post/PostActions'
 import Wrapper from '../../components/Wrapper'
-import { useMeQuery, usePostQuery } from '../../generated/graphql'
+import { useMeQuery } from '../../generated/graphql'
 import { createUrqlClient } from '../../utils/createUrqlClient'
 import EditForm from '../../components/Post/EditForm'
+import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl'
+import { useEditMode } from '../../utils/useEditMode'
 
 const Post = () => {
-   const [isEdit, setIsEdit] = useState(false)
-   const router = useRouter()
-   const postId = typeof router.query.id === 'string' ? parseInt(router.query.id) : -1;
-
+   const { status, close, open } = useEditMode()
    const [{ data: meData }] = useMeQuery()
-   const [{ data, fetching }] = usePostQuery({
-      pause: postId === -1,
-      variables: {
-         id: postId
-      }
-   })
-
-   const openEditor = () => {
-      setIsEdit(true)
-   }
-
-   const closeEditor = () => {
-      setIsEdit(false)
-   }
+   const [{ data, fetching }] = useGetPostFromUrl()
 
    return (
       <Wrapper>
@@ -52,11 +37,11 @@ const Post = () => {
                                     {data?.post.title}
                                  </h6>
                               </div>
-                              {isEdit
+                              {status
                                  ? <EditForm
                                     id={data.post.id}
                                     defaultValue={data.post.text}
-                                    onCancel={closeEditor}
+                                    onCancel={close}
                                  />
                                  : <pre className="text-sm font-sans font-light whitespace-pre-line leading-5">
                                     {data?.post.text}
@@ -64,8 +49,9 @@ const Post = () => {
                            </div>
                         </div>
                         <PostActions
+                           id={data.post.id}
                            isMy={meData?.me?.id === data.post.creatorId}
-                           onOpen={openEditor}
+                           onOpen={open}
                         />
                      </div>
                   </div>

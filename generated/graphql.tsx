@@ -166,7 +166,7 @@ export type UpdatePostMutationVariables = Exact<{
 }>;
 
 
-export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __typename?: 'Post', id: number, createdAt: string, title: string, text: string, creatorId: number, points: number, voteStatus?: number | null, creator: { __typename?: 'User', id: number, username: string } } };
+export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __typename?: 'Post', text: string } };
 
 export type PostsQueryVariables = Exact<{
   limit: Scalars['Int'];
@@ -280,10 +280,10 @@ export function useDeletePostMutation() {
 export const UpdatePostDocument = gql`
     mutation updatePost($id: Int!, $text: String!) {
   updatePost(id: $id, text: $text) {
-    ...RegularPost
+    text
   }
 }
-    ${RegularPostFragmentDoc}`;
+    `;
 
 export function useUpdatePostMutation() {
   return Urql.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument);

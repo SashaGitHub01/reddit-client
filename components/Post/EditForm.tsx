@@ -5,6 +5,7 @@ import ControlInput from '../ControlInput'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Button } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton';
 
 interface UpdateForm {
    text: string
@@ -23,8 +24,8 @@ const EditForm: React.FC<EditFormProps> = ({ id, defaultValue, onCancel }) => {
          .trim()
          .required('Required field'),
    })
-   const [{ fetching }, fetchUpdate] = useUpdatePostMutation()
-   const { control, formState: { errors, isDirty, isSubmitting }, handleSubmit } = useForm<UpdateForm>({
+   const [{ error }, fetchUpdate] = useUpdatePostMutation()
+   const { control, formState: { errors, isDirty, isSubmitting }, handleSubmit, setError } = useForm<UpdateForm>({
       resolver: yupResolver(schema),
       defaultValues: {
          text: defaultValue
@@ -36,6 +37,12 @@ const EditForm: React.FC<EditFormProps> = ({ id, defaultValue, onCancel }) => {
          text: data.text,
          id
       })
+
+      if (error) {
+         setError('text', { message: error.message })
+      } else {
+         onCancel()
+      }
    }
 
    return (
@@ -63,13 +70,15 @@ const EditForm: React.FC<EditFormProps> = ({ id, defaultValue, onCancel }) => {
             >
                Cancel
             </Button>
-            <Button
+            <LoadingButton
+               loading={isSubmitting}
+               disabled={!isDirty}
                variant='contained'
                color={'primary'}
                type={'submit'}
             >
                Save
-            </Button>
+            </LoadingButton>
          </div>
       </form>
    )

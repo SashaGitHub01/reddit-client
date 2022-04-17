@@ -3,8 +3,10 @@ import { useLogoutMutation, useMeQuery } from '../../generated/graphql'
 import { User } from '../../types/User'
 import Link from 'next/link'
 import logo from '../../assets/logo.png'
+import { useRouter } from 'next/router'
 
 const Nav = () => {
+   const router = useRouter()
    const [user, setUser] = useState<User | null>(null)
    const [{ fetching }, fetchLogout] = useLogoutMutation()
    const [{ data }, fetchMe] = useMeQuery()
@@ -19,6 +21,7 @@ const Nav = () => {
 
    const logout = () => {
       setUser(null)
+      router.reload()
       fetchLogout()
    }
 
@@ -39,7 +42,7 @@ const Nav = () => {
                      <div className=''>
                         {user.username}
                      </div>
-                     <button className="" disabled={fetching} onClick={logout}>
+                     <button className="bg-transparent" disabled={fetching} onClick={logout}>
                         <span className='hover:text-gray-400'>
                            LOGOUT
                         </span>
