@@ -6,7 +6,7 @@ import { useMeQuery } from '../generated/graphql'
 import { withApollo } from '../utils/withApollo'
 
 const Home: NextPage = () => {
-   const { data } = useMeQuery() //comment from main
+   const { data } = useMeQuery()
 
    return (
       <Wrapper>
