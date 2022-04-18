@@ -1,10 +1,9 @@
 import React from 'react'
-import TextField from '@mui/material/TextField'
 import { useForm, Controller, SubmitHandler } from 'react-hook-form'
 import LoadingButton from '@mui/lab/LoadingButton';
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useLoginMutation } from '../../generated/graphql'
+import { MeDocument, useLoginMutation } from '../../generated/graphql'
 import Link from 'next/link';
 import ControlInput from '../ControlInput';
 
@@ -14,7 +13,7 @@ interface LoginFormData {
 }
 
 const LoginForm: React.FC = () => {
-   const [_result, fetchLogin] = useLoginMutation()
+   const [fetchLogin] = useLoginMutation()
 
    const schema = Yup.object().shape({
       emailOrUsername: Yup.string()
@@ -30,12 +29,25 @@ const LoginForm: React.FC = () => {
 
    const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
       try {
-         const res = await fetchLogin({ input: data })
-         if (res.error?.graphQLErrors[0]?.message) {
-            setError('emailOrUsername', { message: res.error?.graphQLErrors[0].message })
-         }
-      } catch (err) {
-         console.log(err);
+         await fetchLogin({
+            variables: {
+               input: data
+            },
+
+            update: (cache, { data }) => {
+               cache.writeQuery({
+                  query: MeDocument,
+                  data: {
+                     _typename: 'Query',
+                     me: data?.login
+                  }
+               })
+
+               cache.evict({ fieldName: 'posts' })
+            }
+         })
+      } catch (err: any) {
+         setError('emailOrUsername', { message: err.message })
       }
    }
 

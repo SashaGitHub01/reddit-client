@@ -6,10 +6,11 @@ import { useRouter } from 'next/router'
 import { withUrqlClient } from 'next-urql'
 import { createUrqlClient } from '../utils/createUrqlClient'
 import Link from 'next/link'
+import { withApollo } from '../utils/withApollo'
 
 const Login: React.FC = () => {
    const router = useRouter()
-   const [{ data }] = useMeQuery()
+   const { data } = useMeQuery()
 
    useEffect(() => {
       if (!!data?.me) router.push('/')
@@ -39,4 +40,4 @@ const Login: React.FC = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Login)
+export default withApollo({ ssr: false })(Login)

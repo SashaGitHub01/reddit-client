@@ -17,7 +17,7 @@ interface PostFormProps {
 }
 
 const PostForm: React.FC<PostFormProps> = ({ onCancel }) => {
-   const [_, fetchCreatePost] = useCreatePostMutation()
+   const [fetchCreatePost] = useCreatePostMutation()
 
    const schema = Yup.object().shape({
       title: Yup.string()
@@ -39,9 +39,15 @@ const PostForm: React.FC<PostFormProps> = ({ onCancel }) => {
    const onSubmit: SubmitHandler<PostFormData> = async (data) => {
       try {
          const res = await fetchCreatePost({
-            input: data
+            variables: {
+               input: data
+            },
+
+            update: (cache) => {
+               cache.evict({ fieldName: 'posts' })
+            }
          })
-         if (!res.error) reset({
+         if (!res.errors?.[0]?.message) reset({
             text: ''
          })
          onCancel()

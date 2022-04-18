@@ -14,7 +14,7 @@ interface FormFields {
 
 const ChangePasswordForm: React.FC<{ token: string }> = ({ token }) => {
    const router = useRouter()
-   const [_, fetchChangePassword] = useChangePasswordMutation()
+   const [fetchChangePassword] = useChangePasswordMutation()
    const schema = Yup.object().shape({
       newPassword: Yup.string().min(5).max(20),
       confirm: Yup.string().oneOf([Yup.ref('newPassword'), null], 'Passwords must be equal')
@@ -27,12 +27,14 @@ const ChangePasswordForm: React.FC<{ token: string }> = ({ token }) => {
    const onSubmit: SubmitHandler<FormFields> = async (data) => {
       try {
          const res = await fetchChangePassword({
-            newPassword: data.newPassword,
-            secret: token
+            variables: {
+               newPassword: data.newPassword,
+               secret: token
+            }
          })
 
-         if (res.error?.graphQLErrors[0].message) {
-            setError('newPassword', { message: res.error?.graphQLErrors[0].message })
+         if (res.errors?.[0]?.message) {
+            setError('newPassword', { message: res.errors[0].message })
          }
 
          if (!!res?.data?.changePassword) router.push('/login')

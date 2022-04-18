@@ -1,19 +1,18 @@
 import type { NextPage } from 'next'
-import { withUrqlClient } from 'next-urql'
 import HomeOptions from '../components/Home/HomeOptions'
 import PostsList from '../components/Home/PostsList'
 import Wrapper from '../components/Wrapper'
 import { useMeQuery } from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
+import { withApollo } from '../utils/withApollo'
 
 const Home: NextPage = () => {
-   const [{ data }] = useMeQuery()
+   const { data } = useMeQuery()
 
    return (
       <Wrapper>
          <div className="">
             {data?.me
-               ? <HomeOptions pageProps={''} />
+               ? <HomeOptions />
                : null}
             <PostsList />
          </div>
@@ -21,4 +20,4 @@ const Home: NextPage = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Home)
+export default withApollo({ ssr: true })(Home)

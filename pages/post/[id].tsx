@@ -1,24 +1,23 @@
-import { withUrqlClient } from 'next-urql'
 import React from 'react'
 import Loader from '../../components/Loader'
 import UpdootsSection from '../../components/Post/UpdootsSection'
 import PostActions from '../../components/Post/PostActions'
 import Wrapper from '../../components/Wrapper'
 import { useMeQuery } from '../../generated/graphql'
-import { createUrqlClient } from '../../utils/createUrqlClient'
 import EditForm from '../../components/Post/EditForm'
 import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl'
 import { useEditMode } from '../../utils/useEditMode'
+import { withApollo } from '../../utils/withApollo'
 
-const Post = () => {
+const Post: React.FC = () => {
    const { status, close, open } = useEditMode()
-   const [{ data: meData }] = useMeQuery()
-   const [{ data, fetching }] = useGetPostFromUrl()
+   const { data: meData } = useMeQuery()
+   const { data, loading } = useGetPostFromUrl()
 
    return (
       <Wrapper>
          <div className="flex-auto rounded-md bg-gray-100 py-5 px-4">
-            {fetching
+            {loading
                ? <Loader />
                : !!data?.post
                   ? <div className="flex">
@@ -61,4 +60,4 @@ const Post = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post)
+export default withApollo({ ssr: true })(Post)

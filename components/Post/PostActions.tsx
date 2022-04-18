@@ -15,16 +15,22 @@ interface PostActionsProps {
 }
 
 const PostActions: React.FC<PostActionsProps> = ({ isMy, onOpen, id }) => {
-   const [{ fetching }, fetchDelete] = useDeletePostMutation()
+   const [fetchDelete, { loading }] = useDeletePostMutation()
 
    const handleDelete = async () => {
       await fetchDelete({
-         id
+         variables: {
+            id
+         },
+
+         update: (cache) => {
+            cache.evict({ id: `Post:${id}` })
+         }
       })
    }
 
    return (
-      <div className={`py-3 ${fetching ? 'pointer-events-none' : ''}`}>
+      <div className={`py-3 ${loading ? 'pointer-events-none' : ''}`}>
          <div className="flex items-center justify-between gap-1">
             <Button className='flex items-center' color='myGray'>
                <CommentIcon color='action' />

@@ -1,8 +1,7 @@
 import { NextPage } from 'next'
-import { withUrqlClient } from 'next-urql'
 import React from 'react'
-import { createUrqlClient } from '../../utils/createUrqlClient'
 import ChangePasswordForm from '../../components/change-password/ChangePasswordForm'
+import { withApollo } from '../../utils/withApollo'
 
 interface ChangePasswordProps {
    token: string
@@ -31,4 +30,4 @@ ChangePassword.getInitialProps = (ctx) => {
    }
 }
 
-export default withUrqlClient(createUrqlClient)(ChangePassword)
+export default withApollo({ ssr: false })(ChangePassword)

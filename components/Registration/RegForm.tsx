@@ -4,7 +4,7 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form'
 import { Button } from '@mui/material'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useRegisterMutation } from '../../generated/graphql'
+import { MeDocument, useRegisterMutation } from '../../generated/graphql'
 
 interface RegFormData {
    password2: string,
@@ -14,7 +14,7 @@ interface RegFormData {
 }
 
 const RegForm: React.FC = () => {
-   const [result, fetchReg] = useRegisterMutation()
+   const [fetchReg] = useRegisterMutation()
    const schema = Yup.object().shape({
       username: Yup.string()
          .trim()
@@ -36,12 +36,23 @@ const RegForm: React.FC = () => {
    const onSubmit: SubmitHandler<RegFormData> = async (data) => {
       try {
          const { password2, ...input } = data;
-         const res = await fetchReg({ input })
-         if (res.error?.graphQLErrors[0].message) {
-            setError('username', { message: res.error.graphQLErrors[0].message })
-         }
+         await fetchReg({
+            variables: {
+               input
+            },
+
+            update: (cache, { data }) => {
+               cache.writeQuery({
+                  query: MeDocument,
+                  data: {
+                     _typename: 'Query',
+                     me: data?.registration
+                  }
+               })
+            }
+         })
       } catch (err: any) {
-         console.log(err);
+         setError('email', { message: err.message })
       }
    }
 

@@ -1,23 +1,28 @@
 import { LoadingButton } from '@mui/lab'
 import React, { useState } from 'react'
-import { useMeQuery, usePostsQuery } from '../../../generated/graphql'
+import { PostsQuery, useMeQuery, usePostsQuery } from '../../../generated/graphql'
 import Loader from '../../Loader'
 import Post from '../../Post'
 
 const PostsList: React.FC = () => {
    const [vars, setVars] = useState<{ limit: number, offset: number }>({ limit: 10, offset: 1 })
-   const [{ data, fetching }] = usePostsQuery({
-      variables: vars
+   const { data, loading, fetchMore } = usePostsQuery({
+      variables: { limit: 10, offset: 1 }
    })
-   const [{ data: meData }] = useMeQuery()
+   const { data: meData } = useMeQuery()
 
-   const handleShow = () => {
+   const handleShow = async () => {
+      await fetchMore({
+         variables: {
+            ...vars, offset: vars.offset + 1
+         },
+      })
       setVars({ ...vars, offset: vars.offset + 1 })
    }
 
    return (
       <div className='py-4 flex flex-col gap-6'>
-         {fetching
+         {loading
             ? <Loader />
             : data
                ? <>
@@ -28,7 +33,7 @@ const PostsList: React.FC = () => {
                      && <div className="flex justify-center py-2">
                         <LoadingButton
                            onClick={handleShow}
-                           loading={fetching}
+                           loading={loading}
                            className='bg-btn_primary'
                            variant='contained'
                         >

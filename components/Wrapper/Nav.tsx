@@ -3,26 +3,26 @@ import { useLogoutMutation, useMeQuery } from '../../generated/graphql'
 import { User } from '../../types/User'
 import Link from 'next/link'
 import logo from '../../assets/logo.png'
-import { useRouter } from 'next/router'
+import { useApolloClient } from '@apollo/client'
 
 const Nav = () => {
-   const router = useRouter()
    const [user, setUser] = useState<User | null>(null)
-   const [{ fetching }, fetchLogout] = useLogoutMutation()
-   const [{ data }, fetchMe] = useMeQuery()
-
-   useEffect(() => {
-      fetchMe()
-   }, [])
+   const [fetchLogout, { loading }] = useLogoutMutation()
+   const { data } = useMeQuery()
+   const apollo = useApolloClient()
 
    useEffect(() => {
       if (!!data?.me) setUser(data?.me)
    }, [data])
 
-   const logout = () => {
+   const logout = async () => {
       setUser(null)
-      router.reload()
-      fetchLogout()
+      try {
+         await fetchLogout()
+         await apollo.resetStore()
+      } catch (err) {
+         console.log(err)
+      }
    }
 
    return (
@@ -39,10 +39,10 @@ const Nav = () => {
             <nav className="g">
                {user
                   ? <div className="flex items-center gap-4">
-                     <div className=''>
+                     <div className='truncate max-w-[170px]'>
                         {user.username}
                      </div>
-                     <button className="bg-transparent" disabled={fetching} onClick={logout}>
+                     <button className="bg-transparent" disabled={loading} onClick={logout}>
                         <span className='hover:text-gray-400'>
                            LOGOUT
                         </span>

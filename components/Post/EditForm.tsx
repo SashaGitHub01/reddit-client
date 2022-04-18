@@ -1,6 +1,6 @@
 import React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useUpdatePostMutation } from '../../generated/graphql'
+import { PostDocument, PostQuery, useUpdatePostMutation } from '../../generated/graphql'
 import ControlInput from '../ControlInput'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -24,7 +24,7 @@ const EditForm: React.FC<EditFormProps> = ({ id, defaultValue, onCancel }) => {
          .trim()
          .required('Required field'),
    })
-   const [{ error }, fetchUpdate] = useUpdatePostMutation()
+   const [fetchUpdate, { error },] = useUpdatePostMutation()
    const { control, formState: { errors, isDirty, isSubmitting }, handleSubmit, setError } = useForm<UpdateForm>({
       resolver: yupResolver(schema),
       defaultValues: {
@@ -34,8 +34,33 @@ const EditForm: React.FC<EditFormProps> = ({ id, defaultValue, onCancel }) => {
 
    const onSubmit: SubmitHandler<UpdateForm> = async (data) => {
       await fetchUpdate({
-         text: data.text,
-         id
+         variables: {
+            text: data.text,
+            id
+         },
+
+         update: (cache, { data }) => {
+            const post = cache.readQuery<PostQuery>({
+               query: PostDocument,
+               variables: {
+                  id
+               }
+            })
+
+            cache.writeQuery({
+               query: PostDocument,
+               data: {
+                  _typename: 'Query',
+                  post: {
+                     ...post?.post,
+                     text: data?.updatePost.text
+                  },
+               },
+               variables: {
+                  id
+               }
+            })
+         }
       })
 
       if (error) {

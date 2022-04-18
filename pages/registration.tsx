@@ -6,10 +6,11 @@ import RegForm from '../components/Registration/RegForm'
 import Wrapper from '../components/Wrapper'
 import { useMeQuery } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
+import { withApollo } from '../utils/withApollo'
 
 const Registration: React.FC = () => {
    const router = useRouter()
-   const [{ data }] = useMeQuery()
+   const { data } = useMeQuery()
 
    useEffect(() => {
       if (!!data?.me) router.back()
@@ -39,4 +40,4 @@ const Registration: React.FC = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient)(Registration)
+export default withApollo({ ssr: false })(Registration)

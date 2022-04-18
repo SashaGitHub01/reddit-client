@@ -1,8 +1,7 @@
-import { withUrqlClient } from 'next-urql'
 import React from 'react'
 import ForgotPasswordForm from '../../components/forgot-password/ForgotPasswordForm'
 import Wrapper from '../../components/Wrapper'
-import { createUrqlClient } from '../../utils/createUrqlClient'
+import { withApollo } from '../../utils/withApollo'
 
 const ForgotPassword: React.FC = () => {
    return (
@@ -23,4 +22,4 @@ const ForgotPassword: React.FC = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient)(ForgotPassword)
+export default withApollo({ ssr: false })(ForgotPassword)

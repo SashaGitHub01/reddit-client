@@ -5,7 +5,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import TextField from '@mui/material/TextField'
 import { Button } from '@mui/material'
 import { useForgotPasswordMutation } from '../../generated/graphql'
-import { useRouter } from 'next/router'
 
 interface FormFields {
    email: string,
@@ -13,7 +12,7 @@ interface FormFields {
 
 const ForgotPasswordForm: React.FC = () => {
    const [complete, setComplete] = useState(false)
-   const [_, fetchForgotPassword] = useForgotPasswordMutation()
+   const [fetchForgotPassword] = useForgotPasswordMutation()
    const schema = Yup.object().shape({
       email: Yup.string().email().required(),
    })
@@ -25,10 +24,12 @@ const ForgotPasswordForm: React.FC = () => {
    const onSubmit: SubmitHandler<FormFields> = async (data) => {
       try {
          const res = await fetchForgotPassword({
-            email: data.email
+            variables: {
+               email: data.email
+            }
          })
-         if (res.error?.graphQLErrors[0].message) {
-            setError('email', { message: res.error?.graphQLErrors[0].message })
+         if (res.errors?.[0]?.message) {
+            setError('email', { message: res.errors?.[0]?.message })
          } else if (res.data) {
             setComplete(true)
          }

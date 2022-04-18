@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import CreateIcon from '@mui/icons-material/Create';
 import { Dialog, IconButton, Tooltip, DialogContent } from '@mui/material';
 import PostForm from './PostForm';
-import { withUrqlClient } from 'next-urql';
-import { createUrqlClient } from '../../../utils/createUrqlClient';
 
 const HomeOptions: React.FC = () => {
    const [create, setCreate] = useState(false)
@@ -43,4 +41,4 @@ const HomeOptions: React.FC = () => {
    )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(HomeOptions)
+export default HomeOptions
